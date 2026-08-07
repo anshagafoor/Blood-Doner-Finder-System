@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Blood Donor Finder{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="{% url 'core:home' %}" class="brand"><span class="drop"></span> BloodLink</a>
+    <button class="nav-toggle"><i class="fa-solid fa-bars"></i></button>
+    <div class="nav-links">
+      <a href="{% url 'core:home' %}">Home</a>
+      <a href="{% url 'donors:search' %}">Find Donors</a>
+      <a href="{% url 'organizations:camp_list' %}">Camps</a>
+      <a href="{% url 'rewards:leaderboard' %}">Leaderboard</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'core:dashboard' %}">Dashboard</a>
+        <div class="noti-wrap">
+          <button class="noti-btn"><i class="fa-solid fa-bell"></i>
+            {% if unread_count %}<span class="noti-dot">{{ unread_count }}</span>{% endif %}
+          </button>
+          <div class="noti-panel">
+            <div class="nh">Notifications
+              <a href="{% url 'notifications:list' %}" style="font-size:.8rem;color:var(--red-600)">View all</a>
+            </div>
+            {% for n in recent_notifications %}
+              <a href="{% url 'notifications:mark_read' n.pk %}" class="noti-item {% if not n.is_read %}unread{% endif %}">
+                <span class="ni {% if n.notification_type == 'EMERGENCY' %}bg-red{% elif n.notification_type == 'REWARD' %}bg-amber{% elif n.notification_type == 'CAMP' %}bg-green{% else %}bg-blue{% endif %}">
+                  <i class="fa-solid {% if n.notification_type == 'EMERGENCY' %}fa-triangle-exclamation{% elif n.notification_type == 'REWARD' %}fa-award{% elif n.notification_type == 'CAMP' %}fa-tent{% else %}fa-circle-info{% endif %}"></i>
+                </span>
+                <div><strong style="font-size:.88rem">{{ n.title }}</strong><br><small>{{ n.created_at|timesince }} ago</small></div>
+              </a>
+            {% empty %}<div class="noti-item"><small>No notifications yet.</small></div>{% endfor %}
+          </div>
+        </div>
+        <a href="{% url 'accounts:logout' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      {% else %}
+        <a href="{% url 'accounts:login' %}">Login</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm" style="color:#fff">Register</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+{% if messages %}
+<div class="messages">
+  {% for m in messages %}<div class="toast {{ m.tags }}">
+    <i class="fa-solid {% if m.tags == 'success' %}fa-circle-check{% elif m.tags == 'error' %}fa-circle-xmark{% else %}fa-circle-info{% endif %}"></i>
+    {{ m }}</div>{% endfor %}
+</div>
+{% endif %}
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="cols">
+      <div>
+        <div class="brand"><span class="drop"></span> BloodLink</div>
+        <p style="max-width:340px;font-size:.9rem">Connecting blood donors, hospitals and health organizations to save lives — quickly, when every minute counts.</p>
+      </div>
+      <div>
+        <h5>Quick Links</h5>
+        <div class="lgrid">
+          <a href="{% url 'donors:search' %}">Find Donors</a>
+          <a href="{% url 'organizations:camp_list' %}">Donation Camps</a>
+          <a href="{% url 'rewards:leaderboard' %}">Leaderboard</a>
+          <a href="{% url 'accounts:register' %}">Become a Donor</a>
+        </div>
+      </div>
+      <div>
+        <h5>For Organizations</h5>
+        <div class="lgrid">
+          <a href="{% url 'accounts:register_hospital' %}">Hospital Sign Up</a>
+          <a href="{% url 'accounts:register_organization' %}">Organization Sign Up</a>
+          <a href="{% url 'accounts:login' %}">Login</a>
+        </div>
+      </div>
+    </div>
+    <div class="base">© 2026 BloodLink · Blood Donor Finder System · Department of Computer Applications</div>
+  </div>
+</footer>
+
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
