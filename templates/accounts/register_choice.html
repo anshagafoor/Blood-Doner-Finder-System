@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Register · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="sec-head reveal in"><span class="kicker">Join BloodLink</span><h2>Choose how you want to register</h2><p>Separate accounts with role-based access for donors, hospitals and organizations.</p></div>
+    <div class="grid g-3" style="max-width:960px;margin:0 auto">
+      <a href="{% url 'accounts:register_donor' %}" class="card role-card reveal in">
+        <div class="card-icon bg-red"><i class="fa-solid fa-hand-holding-droplet"></i></div>
+        <h3>Donor</h3><p>Register to donate blood, manage availability and earn rewards.</p>
+        <span class="btn btn-ghost btn-sm" style="margin-top:14px">Register as Donor</span>
+      </a>
+      <a href="{% url 'accounts:register_hospital' %}" class="card role-card reveal in d1">
+        <div class="card-icon bg-blue"><i class="fa-solid fa-hospital"></i></div>
+        <h3>Hospital</h3><p>Raise emergency blood requests and reach donors instantly.</p>
+        <span class="btn btn-ghost btn-sm" style="margin-top:14px">Register Hospital</span>
+      </a>
+      <a href="{% url 'accounts:register_organization' %}" class="card role-card reveal in d2">
+        <div class="card-icon bg-green"><i class="fa-solid fa-people-group"></i></div>
+        <h3>Organization</h3><p>Organize donation camps and awareness programs.</p>
+        <span class="btn btn-ghost btn-sm" style="margin-top:14px">Register Organization</span>
+      </a>
+    </div>
+    <p style="text-align:center;margin-top:28px;color:var(--slate)">Already have an account? <a href="{% url 'accounts:login' %}" style="color:var(--red-600);font-weight:700">Login here</a></p>
+  </div>
+</section>
+{% endblock %}

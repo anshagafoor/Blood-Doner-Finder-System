@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Login · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container form-wrap">
+    <div class="form-card reveal in">
+      <div style="text-align:center;margin-bottom:24px">
+        <div class="card-icon bg-red" style="margin:0 auto 12px"><i class="fa-solid fa-right-to-bracket"></i></div>
+        <h2 style="font-size:1.6rem">Welcome back</h2>
+        <p style="color:var(--slate);font-size:.92rem">Login to your BloodLink account</p>
+      </div>
+      {% if form.non_field_errors %}<div class="field"><ul class="errorlist">{{ form.non_field_errors }}</ul></div>{% endif %}
+      <form method="post" novalidate>{% csrf_token %}
+        {% for field in form %}
+        <div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>
+        {% endfor %}
+        <button class="btn btn-primary btn-block" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+      </form>
+      <p style="text-align:center;margin-top:18px;font-size:.9rem;color:var(--slate)">New here? <a href="{% url 'accounts:register' %}" style="color:var(--red-600);font-weight:700">Create an account</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}
