@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}{{ donor.full_name }} · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container form-wrap">
+    <div class="form-card reveal in" style="text-align:center">
+      <div class="badge-medal" style="background:linear-gradient(135deg,var(--red-500),var(--red-700));margin:0 auto 16px;width:90px;height:90px;font-size:2rem"><i class="fa-solid fa-user"></i></div>
+      <h2>{{ donor.full_name }}</h2>
+      <p style="margin:6px 0 18px"><span class="bloodtag" style="vertical-align:middle">{{ donor.blood_group }}</span>
+        {% if donor.is_available %}<span class="pill pill-green">Available to donate</span>{% else %}<span class="pill pill-gray">Currently unavailable</span>{% endif %}</p>
+      <div class="grid g-2" style="text-align:left">
+        <div class="card" style="box-shadow:none"><small style="color:var(--muted)">District</small><br><strong>{{ donor.district }}</strong></div>
+        <div class="card" style="box-shadow:none"><small style="color:var(--muted)">Phone</small><br><strong>{{ donor.user.phone|default:"—" }}</strong></div>
+        <div class="card" style="box-shadow:none"><small style="color:var(--muted)">Email</small><br><strong>{{ donor.user.email|default:"—" }}</strong></div>
+        <div class="card" style="box-shadow:none"><small style="color:var(--muted)">Donations</small><br><strong>{{ donor.total_donations }}</strong></div>
+      </div>
+      {% if donor.user.phone %}<a href="tel:{{ donor.user.phone }}" class="btn btn-primary btn-block" style="margin-top:18px"><i class="fa-solid fa-phone"></i> Call {{ donor.full_name }}</a>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

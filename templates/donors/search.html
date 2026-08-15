@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Find Donors · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="sec-head reveal in"><span class="kicker">Search</span><h2>Find a blood donor</h2><p>Filter by blood group and district to find available donors near you.</p></div>
+    <div class="form-card reveal in" style="max-width:900px;margin:0 auto 34px">
+      <form method="get">
+        <div class="grid g-3" style="align-items:end">
+          <div class="field" style="margin:0"><label>Blood Group</label>{{ form.blood_group }}</div>
+          <div class="field" style="margin:0"><label>District</label>{{ form.district }}</div>
+          <div class="field" style="margin:0">
+            <div class="checkbox-row" style="margin-bottom:10px">{{ form.only_available }}<label style="margin:0">Available only</label></div>
+            <button class="btn btn-primary btn-block"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    {% if searched %}<p style="text-align:center;color:var(--slate);margin-bottom:20px">{{ results|length }} donor(s) found</p>{% endif %}
+    <div class="grid g-3">
+      {% for d in results %}
+      <div class="card reveal in">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span class="bloodtag">{{ d.blood_group }}</span>
+          {% if d.is_available %}<span class="pill pill-green"><i class="fa-solid fa-circle"></i> Available</span>{% else %}<span class="pill pill-gray">Unavailable</span>{% endif %}
+        </div>
+        <h3 style="font-size:1.1rem">{{ d.full_name }}</h3>
+        <p><i class="fa-solid fa-location-dot"></i> {{ d.district }}{% if d.age %} · {{ d.age }} yrs{% endif %}</p>
+        <p style="margin-top:6px"><span class="pill pill-amber"><i class="fa-solid fa-award"></i> {{ d.total_points }} pts</span> <span class="pill pill-red">{{ d.total_donations }} donations</span></p>
+        <a href="{% url 'donors:detail' d.pk %}" class="btn btn-ghost btn-sm btn-block" style="margin-top:14px"><i class="fa-solid fa-address-card"></i> View contact</a>
+      </div>
+      {% empty %}<div class="empty" style="grid-column:1/-1"><i class="fa-solid fa-user-slash"></i>No donors match your search. Try widening your filters.</div>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
