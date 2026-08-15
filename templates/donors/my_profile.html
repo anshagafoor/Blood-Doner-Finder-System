@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}My Profile · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container form-wrap">
+    <div class="dash-head reveal in"><h1>My Profile</h1>
+      <a href="{% url 'donors:toggle_availability' %}" class="btn {% if profile.is_available %}btn-outline{% else %}btn-green{% endif %} btn-sm">
+        <i class="fa-solid fa-power-off"></i> {% if profile.is_available %}Set Unavailable{% else %}Set Available{% endif %}</a>
+    </div>
+    <div class="form-card reveal in">
+      <form method="post" novalidate>{% csrf_token %}
+        {% for field in form %}
+          {% if field.name == 'is_available' %}
+          <div class="field"><div class="checkbox-row">{{ field }}<label style="margin:0" for="{{ field.id_for_label }}">Available to donate</label></div></div>
+          {% else %}
+          <div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>
+          {% endif %}
+        {% endfor %}
+        <button class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

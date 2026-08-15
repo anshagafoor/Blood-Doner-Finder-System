@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Donation History · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="dash-head reveal in"><h1>Donation History</h1>
+      <span class="pill pill-amber"><i class="fa-solid fa-star"></i> {{ profile.total_points }} points</span></div>
+    <div class="table-card reveal in">
+      <table class="data">
+        <thead><tr><th>Date</th><th>Location</th><th>Units</th><th>Note</th><th>Points</th></tr></thead>
+        <tbody>
+        {% for d in donations %}
+        <tr><td>{{ d.date }}</td><td>{{ d.location }}</td><td>{{ d.units }}</td><td>{{ d.note|default:"—" }}</td><td><span class="pill pill-amber">+{{ d.points_awarded }}</span></td></tr>
+        {% empty %}<tr><td colspan="5"><div class="empty"><i class="fa-solid fa-droplet"></i>No donations recorded yet.</div></td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
