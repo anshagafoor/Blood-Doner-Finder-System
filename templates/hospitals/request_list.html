@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Blood Requests · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="dash-head reveal in"><h1>Blood Requests</h1>
+      <a href="{% url 'hospitals:request_create' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> New Request</a></div>
+    <div class="table-card reveal in">
+      <table class="data">
+        <thead><tr><th>Patient</th><th>Group</th><th>Units</th><th>Urgency</th><th>Status</th><th>Created</th><th></th></tr></thead>
+        <tbody>
+        {% for r in requests %}
+        <tr>
+          <td>{{ r.patient_name }}</td><td><strong style="color:var(--red-600)">{{ r.blood_group }}</strong></td><td>{{ r.units_needed }}</td>
+          <td><span class="pill {% if r.urgency == 'CRITICAL' %}pill-red{% else %}pill-amber{% endif %}">{{ r.get_urgency_display }}</span></td>
+          <td><span class="pill {% if r.status == 'OPEN' %}pill-amber{% elif r.status == 'FULFILLED' %}pill-green{% else %}pill-gray{% endif %}">{{ r.get_status_display }}</span></td>
+          <td>{{ r.created_at|date:"M d, Y" }}</td>
+          <td><a href="{% url 'hospitals:request_detail' r.pk %}" class="btn btn-ghost btn-sm">Manage</a></td>
+        </tr>
+        {% empty %}<tr><td colspan="7"><div class="empty"><i class="fa-solid fa-droplet"></i>No requests yet.</div></td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

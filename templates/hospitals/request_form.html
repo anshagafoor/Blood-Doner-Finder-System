@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}New Emergency Request · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container form-wrap">
+    <div class="form-card reveal in">
+      <div style="text-align:center;margin-bottom:24px">
+        <div class="card-icon bg-red" style="margin:0 auto 12px"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h2 style="font-size:1.6rem">New Emergency Request</h2>
+        <p style="color:var(--slate);font-size:.92rem">Compatible, available donors in the district will be notified automatically.</p>
+      </div>
+      <form method="post" novalidate>{% csrf_token %}
+        {% for field in form %}
+        <div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>
+        {% endfor %}
+        <button class="btn btn-primary btn-block"><i class="fa-solid fa-bell"></i> Create & Notify Donors</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

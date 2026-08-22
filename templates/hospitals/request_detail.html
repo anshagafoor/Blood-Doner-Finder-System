@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Request Details · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="grid g-2">
+      <div class="card reveal in">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <span class="bloodtag" style="width:64px;height:64px;font-size:1.4rem">{{ br.blood_group }}</span>
+          <span class="pill {% if br.urgency == 'CRITICAL' %}pill-red{% else %}pill-amber{% endif %}">{{ br.get_urgency_display }} urgency</span>
+        </div>
+        <h2>{{ br.units_needed }} unit(s) needed</h2>
+        <p style="color:var(--slate);margin:10px 0 18px">For patient <strong>{{ br.patient_name }}</strong></p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div><i class="fa-solid fa-hospital" style="color:var(--red-600);width:22px"></i> {{ br.hospital.hospital_name }}</div>
+          <div><i class="fa-solid fa-location-dot" style="color:var(--red-600);width:22px"></i> {{ br.district }}</div>
+          <div><i class="fa-solid fa-phone" style="color:var(--red-600);width:22px"></i> {{ br.contact_number }}</div>
+          {% if br.needed_by %}<div><i class="fa-solid fa-calendar" style="color:var(--red-600);width:22px"></i> Needed by {{ br.needed_by }}</div>{% endif %}
+          <div><i class="fa-solid fa-flag" style="color:var(--red-600);width:22px"></i> Status:
+            <span class="pill {% if br.status == 'OPEN' %}pill-amber{% elif br.status == 'FULFILLED' %}pill-green{% else %}pill-gray{% endif %}">{{ br.get_status_display }}</span></div>
+        </div>
+        {% if br.notes %}<p style="margin-top:14px;padding:12px;background:var(--red-50);border-radius:10px;font-size:.9rem">{{ br.notes }}</p>{% endif %}
+
+        {% if user.is_authenticated and user.is_hospital and br.hospital.user == user %}
+        <form method="post" action="{% url 'hospitals:request_status' br.pk %}" style="margin-top:18px;display:flex;gap:8px;align-items:center">{% csrf_token %}
+          <select name="status" class="form-input" style="flex:1">
+            {% for val,label in br.Status.choices %}<option value="{{ val }}" {% if br.status == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+          <button class="btn btn-primary btn-sm">Update</button>
+        </form>
+        {% endif %}
+      </div>
+
+      {% if donors is not None %}
+      <div class="card reveal in d1">
+        <h3><i class="fa-solid fa-users" style="color:var(--red-600)"></i> Matching donors ({{ donors|length }})</h3>
+        <p style="font-size:.85rem;color:var(--muted);margin-bottom:12px">Compatible & available in {{ br.district }}. Log a donation to award points.</p>
+        {% for d in donors %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)">
+          <div><strong>{{ d.full_name }}</strong> <span class="pill pill-red" style="font-size:.7rem">{{ d.blood_group }}</span><br>
+            <small style="color:var(--muted)">{{ d.user.phone|default:"no phone" }}</small></div>
+          {% if user.is_hospital and br.hospital.user == user %}
+          <form method="post" action="{% url 'hospitals:log_donation' br.pk %}">{% csrf_token %}
+            <input type="hidden" name="donor_id" value="{{ d.pk }}">
+            <button class="btn btn-green btn-sm"><i class="fa-solid fa-check"></i> Log</button>
+          </form>
+          {% endif %}
+        </div>
+        {% empty %}<div class="empty"><i class="fa-solid fa-user-slash"></i>No matching available donors found.</div>{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
