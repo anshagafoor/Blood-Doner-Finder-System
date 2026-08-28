@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}New Program · BloodLink{% endblock %}
+{% block content %}
+<section class="section"><div class="container form-wrap">
+  <div class="form-card reveal in">
+    <div style="text-align:center;margin-bottom:22px"><div class="card-icon bg-blue" style="margin:0 auto 12px"><i class="fa-solid fa-bullhorn"></i></div><h2>Add Awareness Program</h2></div>
+    <form method="post" novalidate>{% csrf_token %}
+      {% for field in form %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>{% endfor %}
+      <button class="btn btn-primary btn-block"><i class="fa-solid fa-check"></i> Add Program</button>
+    </form>
+  </div>
+</div></section>
+{% endblock %}

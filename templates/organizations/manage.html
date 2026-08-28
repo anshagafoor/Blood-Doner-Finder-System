@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Manage · BloodLink{% endblock %}
+{% block content %}
+<section class="section"><div class="container">
+  <div class="dash-head reveal in"><h1>Manage Camps & Programs</h1>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a href="{% url 'organizations:awareness_create' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-bullhorn"></i> Add Program</a>
+      <a href="{% url 'organizations:camp_create' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> New Camp</a></div>
+  </div>
+  <div class="grid g-2">
+    <div class="card reveal in"><h3><i class="fa-solid fa-tent" style="color:var(--green)"></i> Camps</h3>
+      {% for c in camps %}<div style="padding:12px 0;border-bottom:1px solid var(--line)">
+        <strong>{{ c.title }}</strong> <span class="pill {% if c.is_upcoming %}pill-green{% else %}pill-gray{% endif %}">{{ c.date }}</span><br>
+        <small style="color:var(--muted)">{{ c.location }} · {{ c.registrations.count }} registered</small></div>
+      {% empty %}<div class="empty"><i class="fa-solid fa-tent"></i>No camps yet.</div>{% endfor %}
+    </div>
+    <div class="card reveal in d1"><h3><i class="fa-solid fa-bullhorn" style="color:var(--blue)"></i> Awareness Programs</h3>
+      {% for p in programs %}<div style="padding:12px 0;border-bottom:1px solid var(--line)"><strong>{{ p.title }}</strong><br><small style="color:var(--muted)">{{ p.date }}</small></div>
+      {% empty %}<div class="empty"><i class="fa-solid fa-bullhorn"></i>No programs yet.</div>{% endfor %}
+    </div>
+  </div>
+</div></section>
+{% endblock %}

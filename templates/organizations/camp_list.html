@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Donation Camps · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="sec-head reveal in"><span class="kicker">Get involved</span><h2>Upcoming donation camps</h2><p>Register for a camp near you and earn reward points.</p></div>
+    <div class="grid g-3">
+      {% for c in camps %}
+      <div class="card reveal in">
+        <div class="card-icon bg-green"><i class="fa-solid fa-tent"></i></div>
+        <h3>{{ c.title }}</h3>
+        <p>{{ c.description|truncatewords:18 }}</p>
+        <div style="margin:12px 0;font-size:.9rem;color:var(--slate)">
+          <div><i class="fa-solid fa-calendar" style="color:var(--green)"></i> {{ c.date }}{% if c.start_time %} · {{ c.start_time }}{% endif %}</div>
+          <div><i class="fa-solid fa-location-dot" style="color:var(--green)"></i> {{ c.location }}, {{ c.district }}</div>
+          <div><i class="fa-solid fa-building" style="color:var(--green)"></i> {{ c.organization.org_name }}</div>
+        </div>
+        {% if user.is_authenticated and user.is_donor %}
+        <a href="{% url 'organizations:camp_register' c.pk %}" class="btn btn-primary btn-sm btn-block"><i class="fa-solid fa-hand-holding-droplet"></i> Register (+20 pts)</a>
+        {% elif not user.is_authenticated %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-sm btn-block">Login to register</a>
+        {% endif %}
+      </div>
+      {% empty %}<div class="empty" style="grid-column:1/-1"><i class="fa-solid fa-tent"></i>No upcoming camps right now. Check back soon!</div>{% endfor %}
+    </div>
+
+    {% if programs %}
+    <div class="sec-head reveal in" style="margin-top:56px"><span class="kicker">Learn</span><h2>Awareness programs</h2></div>
+    <div class="grid g-3">
+      {% for p in programs %}
+      <div class="card reveal in"><div class="card-icon bg-blue"><i class="fa-solid fa-bullhorn"></i></div>
+        <h3>{{ p.title }}</h3><p>{{ p.description|truncatewords:18 }}</p>
+        <small style="color:var(--muted)"><i class="fa-solid fa-calendar"></i> {{ p.date }} · {{ p.location }}</small></div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
