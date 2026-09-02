@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Notifications · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:760px">
+    <div class="dash-head reveal in"><h1><i class="fa-solid fa-bell" style="color:var(--red-600)"></i> Notifications</h1>
+      <a href="{% url 'notifications:mark_all_read' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-check-double"></i> Mark all read</a></div>
+    <div class="table-card reveal in" style="padding:6px">
+      {% for n in notes %}
+      <a href="{% url 'notifications:mark_read' n.pk %}" class="noti-item {% if not n.is_read %}unread{% endif %}" style="border-radius:12px">
+        <span class="ni {% if n.notification_type == 'EMERGENCY' %}bg-red{% elif n.notification_type == 'REWARD' %}bg-amber{% elif n.notification_type == 'CAMP' %}bg-green{% else %}bg-blue{% endif %}">
+          <i class="fa-solid {% if n.notification_type == 'EMERGENCY' %}fa-triangle-exclamation{% elif n.notification_type == 'REWARD' %}fa-award{% elif n.notification_type == 'CAMP' %}fa-tent{% else %}fa-circle-info{% endif %}"></i></span>
+        <div style="flex:1"><strong>{{ n.title }}</strong>{% if not n.is_read %} <span class="pill pill-red" style="font-size:.62rem">NEW</span>{% endif %}<br>
+          <span style="color:var(--slate);font-size:.9rem">{{ n.message }}</span><br><small>{{ n.created_at|timesince }} ago</small></div>
+      </a>
+      {% empty %}<div class="empty"><i class="fa-solid fa-bell-slash"></i>You have no notifications.</div>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
