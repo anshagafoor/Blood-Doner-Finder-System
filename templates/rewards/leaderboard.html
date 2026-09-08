@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Leaderboard · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="sec-head reveal in"><span class="kicker">Top donors</span><h2>Community Leaderboard</h2><p>Celebrating our most active life-savers.</p></div>
+    <div class="table-card reveal in" style="max-width:760px;margin:0 auto">
+      <table class="data"><thead><tr><th>Rank</th><th>Donor</th><th>District</th><th>Donations</th><th>Points</th></tr></thead><tbody>
+        {% for d in top %}
+        <tr>
+          <td><strong style="color:var(--red-600)">
+            {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% else %}#{{ forloop.counter }}{% endif %}</strong></td>
+          <td><strong>{{ d.full_name }}</strong> <span class="pill pill-red" style="font-size:.68rem">{{ d.blood_group }}</span></td>
+          <td>{{ d.district }}</td><td>{{ d.total_donations }}</td><td><span class="pill pill-amber">{{ d.total_points }}</span></td>
+        </tr>
+        {% empty %}<tr><td colspan="5"><div class="empty"><i class="fa-solid fa-ranking-star"></i>No donors ranked yet.</div></td></tr>{% endfor %}
+      </tbody></table>
+    </div>
+  </div>
+</section>
+{% endblock %}
