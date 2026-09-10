@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Hospital Dashboard · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="dash-head reveal in">
+      <div><h1>{{ hospital.hospital_name }}</h1><p style="color:var(--slate)"><i class="fa-solid fa-location-dot"></i> {{ hospital.district }}</p></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="{% url 'hospitals:profile' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-gear"></i> Profile</a>
+        <a href="{% url 'hospitals:request_create' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> New Emergency Request</a>
+      </div>
+    </div>
+    <div class="grid g-3" style="margin-bottom:26px">
+      <div class="stat-card reveal in"><i class="fa-solid fa-list mini-ico"></i><div class="lbl">Total Requests</div><div class="val">{{ total_count }}</div></div>
+      <div class="stat-card reveal in d1"><i class="fa-solid fa-hourglass-half mini-ico"></i><div class="lbl">Open</div><div class="val" style="color:var(--red-600)">{{ open_count }}</div></div>
+      <div class="stat-card reveal in d2"><i class="fa-solid fa-circle-check mini-ico"></i><div class="lbl">Fulfilled</div><div class="val" style="color:var(--green)">{{ fulfilled_count }}</div></div>
+    </div>
+    <div class="card reveal in">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h3><i class="fa-solid fa-droplet" style="color:var(--red-600)"></i> Recent requests</h3>
+        <a href="{% url 'hospitals:request_list' %}" class="btn btn-ghost btn-sm">View all</a>
+      </div>
+      {% for r in requests %}
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)">
+        <div style="display:flex;align-items:center;gap:12px"><span class="bloodtag">{{ r.blood_group }}</span>
+          <div><strong>{{ r.patient_name }}</strong><br><small style="color:var(--muted)">{{ r.units_needed }} unit(s) · {{ r.created_at|date:"M d" }}</small></div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="pill {% if r.status == 'OPEN' %}pill-amber{% elif r.status == 'FULFILLED' %}pill-green{% else %}pill-gray{% endif %}">{{ r.get_status_display }}</span>
+          <a href="{% url 'hospitals:request_detail' r.pk %}" class="btn btn-ghost btn-sm">Manage</a>
+        </div>
+      </div>
+      {% empty %}<div class="empty"><i class="fa-solid fa-droplet"></i>No requests yet. Create your first emergency request.</div>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
