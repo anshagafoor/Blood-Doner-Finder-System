@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="dash-head reveal in">
+      <div><h1>Hi, {{ profile.full_name|default:user.username }} 👋</h1>
+        <p style="color:var(--slate)">Blood group <strong style="color:var(--red-600)">{{ profile.blood_group }}</strong> · {{ profile.district }}</p></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="{% url 'donors:my_profile' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-user-pen"></i> Edit Profile</a>
+        <a href="{% url 'rewards:my_rewards' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-award"></i> My Rewards</a>
+      </div>
+    </div>
+
+    <div class="grid g-4" style="margin-bottom:26px">
+      <div class="stat-card reveal in"><i class="fa-solid fa-droplet mini-ico"></i><div class="lbl">Total Donations</div><div class="val">{{ profile.total_donations }}</div></div>
+      <div class="stat-card reveal in d1"><i class="fa-solid fa-star mini-ico"></i><div class="lbl">Reward Points</div><div class="val">{{ profile.total_points }}</div></div>
+      <div class="stat-card reveal in d2"><i class="fa-solid fa-heart mini-ico"></i><div class="lbl">Availability</div><div class="val">{% if profile.is_available %}<span class="pill pill-green">Available</span>{% else %}<span class="pill pill-gray">Unavailable</span>{% endif %}</div></div>
+      <div class="stat-card reveal in d3"><i class="fa-solid fa-clock mini-ico"></i><div class="lbl">Eligible to donate</div><div class="val">{% if profile.eligible_to_donate %}<span class="pill pill-green">Yes</span>{% else %}<span class="pill pill-amber">Wait</span>{% endif %}</div></div>
+    </div>
+
+    <div class="grid g-2">
+      <div class="card reveal in">
+        <h3><i class="fa-solid fa-triangle-exclamation" style="color:var(--red-600)"></i> Requests you can help with</h3>
+        {% for r in open_requests %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)">
+          <div><strong>{{ r.blood_group }} · {{ r.units_needed }} unit(s)</strong><br><small style="color:var(--muted)">{{ r.hospital.hospital_name }} · {{ r.district }}</small></div>
+          <a href="{% url 'hospitals:request_detail' r.pk %}" class="btn btn-ghost btn-sm">View</a>
+        </div>
+        {% empty %}<div class="empty"><i class="fa-solid fa-circle-check"></i>No open requests near you right now.</div>{% endfor %}
+      </div>
+      <div class="card reveal in d1">
+        <h3><i class="fa-solid fa-clock-rotate-left" style="color:var(--red-600)"></i> Recent donations</h3>
+        {% for d in recent_donations %}
+        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line)">
+          <div><strong>{{ d.location }}</strong><br><small style="color:var(--muted)">{{ d.date }}</small></div>
+          <span class="pill pill-amber">+{{ d.points_awarded }} pts</span>
+        </div>
+        {% empty %}<div class="empty"><i class="fa-solid fa-droplet"></i>No donations logged yet.<br><a href="{% url 'donors:history' %}" style="color:var(--red-600)">View history</a></div>{% endfor %}
+        {% if recent_donations %}<a href="{% url 'donors:history' %}" class="btn btn-ghost btn-sm btn-block" style="margin-top:14px">Full history</a>{% endif %}
+      </div>
+    </div>
+
+    {% if badges %}
+    <div style="margin-top:26px">
+      <h3 class="reveal in" style="margin-bottom:16px"><i class="fa-solid fa-medal" style="color:var(--amber)"></i> Your badges</h3>
+      <div class="grid g-4">
+        {% for b in badges %}
+        <div class="badge-tile reveal in"><div class="badge-medal" style="background:linear-gradient(135deg,{{ b.badge.color }},#7a0d12)"><i class="fa-solid {{ b.badge.icon }}"></i></div><h4>{{ b.badge.name }}</h4><p>{{ b.badge.description }}</p></div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

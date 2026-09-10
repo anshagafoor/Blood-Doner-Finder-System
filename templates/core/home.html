@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="reveal in">
+      <span class="pill pill-red"><i class="fa-solid fa-heart-pulse"></i> Every drop counts</span>
+      <h1 style="margin-top:16px">Find a <span class="hl">blood donor</span><br>when it matters most.</h1>
+      <p class="lead">A centralized platform connecting donors, hospitals and health organizations. Search by blood group and district, send emergency requests, and get notified instantly.</p>
+      <div class="hero-cta">
+        <a href="{% url 'donors:search' %}" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Find Donors</a>
+        <a href="{% url 'accounts:register_donor' %}" class="btn btn-outline"><i class="fa-solid fa-hand-holding-droplet"></i> Become a Donor</a>
+      </div>
+      <div class="hero-badges">
+        <div class="hero-badge"><i class="fa-solid fa-bolt"></i> Instant emergency alerts</div>
+        <div class="hero-badge"><i class="fa-solid fa-location-dot"></i> District-based search</div>
+        <div class="hero-badge"><i class="fa-solid fa-award"></i> Rewards & badges</div>
+      </div>
+    </div>
+    <div class="hero-visual reveal in d2">
+      <div class="blob"><div class="bignum"><b>{{ stats.donors }}</b><span>Registered Donors</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:20px">
+  <div class="container">
+    <div class="stats-band grid g-4 reveal">
+      <div class="stat"><b data-count="{{ stats.donors }}">0</b><span>Donors</span></div>
+      <div class="stat"><b data-count="{{ stats.hospitals }}">0</b><span>Hospitals</span></div>
+      <div class="stat"><b data-count="{{ stats.organizations }}">0</b><span>Organizations</span></div>
+      <div class="stat"><b data-count="{{ stats.donations }}">0</b><span>Donations</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:20px">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="kicker">What we do</span>
+      <h2>Everything you need to save a life</h2>
+      <p>Six connected modules that make finding and managing blood donations effortless.</p>
+    </div>
+    <div class="grid g-3">
+      {% for f in "x"|ljust:1 %}{% endfor %}
+      <div class="card reveal"><div class="card-icon bg-red"><i class="fa-solid fa-magnifying-glass"></i></div><h3>Smart Donor Search</h3><p>Filter donors by blood group and district, and view their availability and contact details instantly.</p></div>
+      <div class="card reveal d1"><div class="card-icon bg-amber"><i class="fa-solid fa-triangle-exclamation"></i></div><h3>Emergency Requests</h3><p>Hospitals raise urgent requests; the system automatically alerts every compatible, available donor nearby.</p></div>
+      <div class="card reveal d2"><div class="card-icon bg-green"><i class="fa-solid fa-tent"></i></div><h3>Donation Camps</h3><p>Health organizations host camps and awareness programs, and donors can register in one tap.</p></div>
+      <div class="card reveal"><div class="card-icon bg-purple"><i class="fa-solid fa-award"></i></div><h3>Rewards & Badges</h3><p>Earn points for every donation and camp, unlock badges, and climb the community leaderboard.</p></div>
+      <div class="card reveal d1"><div class="card-icon bg-blue"><i class="fa-solid fa-bell"></i></div><h3>Live Notifications</h3><p>Real-time alerts for emergency requests, new camps, and reward milestones — never miss a call to help.</p></div>
+      <div class="card reveal d2"><div class="card-icon bg-red"><i class="fa-solid fa-chart-line"></i></div><h3>Admin & Analytics</h3><p>Admins manage every entity and view reports on donors, requests and blood group distribution.</p></div>
+    </div>
+  </div>
+</section>
+
+{% if urgent %}
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="sec-head reveal"><span class="kicker">Act now</span><h2>Open emergency requests</h2></div>
+    <div class="grid g-4">
+      {% for r in urgent %}
+      <div class="card reveal">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span class="bloodtag">{{ r.blood_group }}</span>
+          <span class="pill {% if r.urgency == 'CRITICAL' %}pill-red{% else %}pill-amber{% endif %}">{{ r.get_urgency_display }}</span>
+        </div>
+        <h3 style="font-size:1rem">{{ r.units_needed }} unit(s) needed</h3>
+        <p><i class="fa-solid fa-location-dot"></i> {{ r.district }}<br><i class="fa-solid fa-hospital"></i> {{ r.hospital.hospital_name }}</p>
+        <a href="{% url 'hospitals:request_detail' r.pk %}" class="btn btn-ghost btn-sm btn-block" style="margin-top:12px">View details</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="card reveal" style="background:linear-gradient(135deg,var(--red-600),var(--red-800,#7a0d12));color:#fff;text-align:center;padding:52px">
+      <h2 style="font-size:2rem;color:#fff">Ready to save lives?</h2>
+      <p style="color:#fff;opacity:.92;max-width:520px;margin:12px auto 26px">Join thousands of donors making a difference. Registration takes less than two minutes.</p>
+      <a href="{% url 'accounts:register' %}" class="btn btn-white"><i class="fa-solid fa-user-plus"></i> Get Started</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
