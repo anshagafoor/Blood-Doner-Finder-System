@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="dash-head reveal in">
+      <div><h1><i class="fa-solid fa-gauge-high" style="color:var(--red-600)"></i> Admin Analytics</h1><p style="color:var(--slate)">System overview & reports</p></div>
+      <a href="/admin/" class="btn btn-primary btn-sm"><i class="fa-solid fa-toolbox"></i> Django Admin</a>
+    </div>
+
+    <div class="grid g-4" style="margin-bottom:22px">
+      <div class="stat-card reveal in"><i class="fa-solid fa-users mini-ico"></i><div class="lbl">Donors</div><div class="val" data-count="{{ total_donors }}">0</div></div>
+      <div class="stat-card reveal in d1"><i class="fa-solid fa-hospital mini-ico"></i><div class="lbl">Hospitals</div><div class="val" data-count="{{ total_hospitals }}">0</div></div>
+      <div class="stat-card reveal in d2"><i class="fa-solid fa-people-group mini-ico"></i><div class="lbl">Organizations</div><div class="val" data-count="{{ total_orgs }}">0</div></div>
+      <div class="stat-card reveal in d3"><i class="fa-solid fa-droplet mini-ico"></i><div class="lbl">Total Donations</div><div class="val" data-count="{{ total_donations }}">0</div></div>
+    </div>
+    <div class="grid g-4" style="margin-bottom:28px">
+      <div class="stat-card reveal in"><i class="fa-solid fa-list mini-ico"></i><div class="lbl">Total Requests</div><div class="val" data-count="{{ total_requests }}">0</div></div>
+      <div class="stat-card reveal in d1"><i class="fa-solid fa-hourglass mini-ico"></i><div class="lbl">Open Requests</div><div class="val" style="color:var(--red-600)" data-count="{{ open_requests }}">0</div></div>
+      <div class="stat-card reveal in d2"><i class="fa-solid fa-circle-check mini-ico"></i><div class="lbl">Fulfilled</div><div class="val" style="color:var(--green)" data-count="{{ fulfilled_requests }}">0</div></div>
+      <div class="stat-card reveal in d3"><i class="fa-solid fa-tent mini-ico"></i><div class="lbl">Camps</div><div class="val" data-count="{{ total_camps }}">0</div></div>
+    </div>
+
+    <div class="grid g-2">
+      <div class="card reveal in">
+        <h3 style="margin-bottom:18px"><i class="fa-solid fa-chart-simple" style="color:var(--red-600)"></i> Donors by blood group</h3>
+        {% for b in blood_groups %}
+        <div class="bar-row"><span class="bl">{{ b.group }}</span>
+          <div class="bar-track"><div class="bar-fill" data-w="{% widthratio b.count max_bg 100 %}">{{ b.count }}</div></div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="card reveal in d1">
+        <h3 style="margin-bottom:18px"><i class="fa-solid fa-location-dot" style="color:var(--red-600)"></i> Top districts</h3>
+        {% for d in district_data %}
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)">
+          <span>{{ d.district }}</span><span class="pill pill-red">{{ d.count }} donors</span></div>
+        {% empty %}<div class="empty"><i class="fa-solid fa-map"></i>No data yet.</div>{% endfor %}
+      </div>
+    </div>
+
+    <div class="card reveal in" style="margin-top:26px">
+      <h3 style="margin-bottom:14px"><i class="fa-solid fa-clock-rotate-left" style="color:var(--red-600)"></i> Recent blood requests</h3>
+      <div class="table-card" style="box-shadow:none;border:none">
+        <table class="data">
+          <thead><tr><th>Patient</th><th>Group</th><th>Units</th><th>District</th><th>Urgency</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for r in recent_requests %}
+          <tr><td>{{ r.patient_name }}</td><td><strong style="color:var(--red-600)">{{ r.blood_group }}</strong></td><td>{{ r.units_needed }}</td><td>{{ r.district }}</td>
+            <td><span class="pill {% if r.urgency == 'CRITICAL' %}pill-red{% else %}pill-amber{% endif %}">{{ r.get_urgency_display }}</span></td>
+            <td><span class="pill {% if r.status == 'OPEN' %}pill-amber{% elif r.status == 'FULFILLED' %}pill-green{% else %}pill-gray{% endif %}">{{ r.get_status_display }}</span></td></tr>
+          {% empty %}<tr><td colspan="6" style="text-align:center;color:var(--muted)">No requests yet.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
