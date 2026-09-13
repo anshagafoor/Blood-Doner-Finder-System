@@ -245,3 +245,13 @@ table.data tr:hover td{background:var(--red-50)}
 .reveal.in{animation:fadeUp .7s cubic-bezier(.2,.8,.2,1) forwards}
 .reveal.d1{animation-delay:.08s}.reveal.d2{animation-delay:.16s}.reveal.d3{animation-delay:.24s}.reveal.d4{animation-delay:.32s}
 .spin-in{animation:fadeUp .6s ease forwards}
+
+/* Responsive adjustments and badge micro-interactions */
+@media (max-width: 768px) {
+  .hero-section { padding: 2.5rem 1rem; }
+  .grid-cards { grid-template-columns: 1fr; }
+}
+.badge-pill:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
