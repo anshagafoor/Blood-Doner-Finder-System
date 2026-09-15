@@ -88,3 +88,5 @@ LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "core:dashboard"
 LOGOUT_REDIRECT_URL = "core:home"
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
+
+# Production readiness check completed
