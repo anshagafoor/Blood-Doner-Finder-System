@@ -21,6 +21,29 @@
         </div>
         {% if br.notes %}<p style="margin-top:14px;padding:12px;background:var(--red-50);border-radius:10px;font-size:.9rem">{{ br.notes }}</p>{% endif %}
 
+        {% if user.is_authenticated and user.is_donor %}
+          {% if my_response %}
+            <div style="margin-top:18px;padding:12px;border-radius:10px;background:{% if my_response.can_donate %}#e8f5e9{% else %}#f3f3f3{% endif %}">
+              <i class="fa-solid {% if my_response.can_donate %}fa-circle-check{% else %}fa-circle-info{% endif %}" style="color:{% if my_response.can_donate %}var(--green){% else %}var(--muted){% endif %}"></i>
+              You responded: <strong>{{ my_response.get_reply_display }}</strong>
+            </div>
+          {% elif can_respond %}
+            <div style="margin-top:18px;padding:14px;border-radius:10px;background:var(--red-50)">
+              <strong style="display:block;margin-bottom:8px">Can you help with this request?</strong>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <form method="post" action="{% url 'hospitals:respond' br.pk %}">{% csrf_token %}
+                  <input type="hidden" name="reply" value="CAN_DONATE">
+                  <button class="btn btn-green btn-sm"><i class="fa-solid fa-hand-holding-droplet"></i> I can donate</button>
+                </form>
+                <form method="post" action="{% url 'hospitals:respond' br.pk %}">{% csrf_token %}
+                  <input type="hidden" name="reply" value="CANT">
+                  <button class="btn btn-ghost btn-sm"><i class="fa-solid fa-xmark"></i> Can't right now</button>
+                </form>
+              </div>
+            </div>
+          {% endif %}
+        {% endif %}
+
         {% if user.is_authenticated and user.is_hospital and br.hospital.user == user %}
         <form method="post" action="{% url 'hospitals:request_status' br.pk %}" style="margin-top:18px;display:flex;gap:8px;align-items:center">{% csrf_token %}
           <select name="status" class="form-input" style="flex:1">
@@ -50,6 +73,30 @@
       </div>
       {% endif %}
     </div>
+
+    {% if responses is not None %}
+    <div class="card reveal in" style="margin-top:22px">
+      <h3><i class="fa-solid fa-reply-all" style="color:var(--green)"></i> Donor responses ({{ responses|length }})</h3>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:12px">Donors who replied to this request.</p>
+      <div class="table-card" style="box-shadow:none">
+        <table class="data">
+          <thead><tr><th>Donor</th><th>Group</th><th>Response</th><th>Phone</th><th>Email</th><th>When</th></tr></thead>
+          <tbody>
+          {% for r in responses %}
+            <tr>
+              <td><strong>{{ r.donor.full_name }}</strong></td>
+              <td><span class="pill pill-red" style="font-size:.68rem">{{ r.donor.blood_group }}</span></td>
+              <td><span class="pill {% if r.can_donate %}pill-green{% else %}pill-gray{% endif %}">{{ r.get_reply_display }}</span></td>
+              <td>{{ r.donor.user.phone|default:"—" }}</td>
+              <td>{% if r.donor.user.email %}<a href="mailto:{{ r.donor.user.email }}">{{ r.donor.user.email }}</a>{% else %}—{% endif %}</td>
+              <td><small>{{ r.created_at|timesince }} ago</small></td>
+            </tr>
+          {% empty %}<tr><td colspan="6"><div class="empty"><i class="fa-solid fa-inbox"></i>No responses yet.</div></td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}

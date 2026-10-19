@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Pending Approval · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container form-wrap">
+    <div class="form-card reveal in" style="text-align:center">
+      <div class="card-icon bg-amber" style="margin:0 auto 16px;width:72px;height:72px;font-size:1.8rem">
+        <i class="fa-solid fa-hourglass-half"></i></div>
+      {% if status == 'REJECTED' %}
+        <h2>Account not approved</h2>
+        <p style="color:var(--slate);margin:12px 0 20px">
+          Your account was not approved by the administrator. Please contact support or try registering again with correct details.</p>
+      {% else %}
+        <h2>Your account is pending approval</h2>
+        <p style="color:var(--slate);margin:12px 0 20px">
+          Thanks for registering! For security, hospital and organization accounts are reviewed by an
+          administrator before activation. You'll be notified as soon as your account is approved —
+          then you'll have full access to raise requests and manage camps.</p>
+        <span class="pill pill-amber"><i class="fa-solid fa-clock"></i> Status: Pending review</span>
+      {% endif %}
+      <div style="margin-top:24px">
+        <a href="{% url 'core:home' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-house"></i> Back to Home</a>
+        <a href="{% url 'accounts:logout' %}" class="btn btn-primary btn-sm" style="color:#fff"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

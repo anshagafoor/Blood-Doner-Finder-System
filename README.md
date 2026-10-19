@@ -1,88 +1,99 @@
-# 🩸 Blood Donor Finder System
+# 🩸 BloodLink — Blood Donor Finder System
 
-A full-featured, modern web platform connecting voluntary blood donors, healthcare facilities, and charity organizations to streamline life-saving blood donations.
-
----
-
-## 🌟 Key Features
-
-### 👤 Role-Based Portals
-- **Donors**: Search and connect with requests, view donation history, track eligibility cooldowns, and view rewards.
-- **Hospitals**: Post emergency and standard blood requests, track real-time fulfillment, and locate matching donors by blood group compatibility.
-- **Organizations**: Schedule and coordinate blood donation camps and community awareness drives.
-- **Administrators**: Centralized dashboard to oversee hospital/organization verifications, camp approvals, and platform metrics.
-
-### 🩸 Intelligent Compatibility & Matching
-- Real-time blood group compatibility matching matrix (ABO and Rh factor).
-- Proximity and availability filtering for rapid donor discovery.
-
-### 🏆 Gamification & Rewards
-- Donor badges, point accumulation for verified donations, and public leaderboards to encourage voluntary giving.
-
-### 🔔 Real-Time Notification System
-- Immediate alerts for urgent requests and camp invitations with global unread badge counters.
+A Django web app connecting **donors, hospitals and health organizations** for
+emergency blood needs — with donor search, emergency requests + auto-matching,
+donation camps, a rewards/badge system, notifications, and admin analytics.
 
 ---
 
-## 🚀 Quick Start & Installation
+## 🚀 Quick Start
 
-### 1. Prerequisites
-- Python 3.10+
-- Virtual environment (`venv`)
+### Easiest — Windows one-click
+Just **double-click `start.bat`**. The first time it automatically creates the
+environment, installs everything, sets up the database and loads demo data; after
+that it detects the existing environment and launches the app directly, opening
+your browser at http://127.0.0.1:8000.
 
-### 2. Setup Virtual Environment
-```bash
-python -m venv .venv
-# On Windows:
-.venv\Scripts\activate
-# On Linux/macOS:
-source .venv/bin/activate
-```
-
-### 3. Install Dependencies
+### Manual (any OS)
 ```bash
 pip install -r requirements.txt
-```
-
-### 4. Database Setup & Seeding
-```bash
 python manage.py migrate
-python manage.py seed
-```
-> The `seed` command initializes sample users across all roles (Donor, Hospital, Organization, Admin) with dummy camps, requests, and rewards for instant testing.
-
-### 5. Run Local Server
-```bash
+python manage.py seed          # loads demo data (badges, donors, hospitals, orgs)
 python manage.py runserver
 ```
-Navigate to `http://127.0.0.1:8000` in your web browser.
+
+Open **http://127.0.0.1:8000/**
+
+### Demo accounts (from `seed`)
+
+| Role | Username | Password | Notes |
+|------|----------|----------|-------|
+| Admin | `admin` | `admin12345` | approvals + analytics |
+| Hospital (approved) | `hospital1` | `hospital12345` | can raise requests |
+| Hospital (pending) | `hospital2` | `hospital12345` | awaiting admin approval |
+| Organization (approved) | `org1` | `org12345` | can run camps |
+| Organization (pending) | `org2` | `org12345` | awaiting admin approval |
+| Donors | `donor1` … `donor16` | `donor12345` | |
 
 ---
 
-## 📁 Project Architecture
+## ✨ Latest feature updates
 
-```
-blood_donor_finder/
-├── accounts/          # User authentication, roles, custom user model, and permissions
-├── config/            # Django project settings, root URLs, ASGI, and WSGI entrypoints
-├── core/              # Landing page, unified dashboards, and management seed commands
-├── donors/            # Donor profiles, search filters, and donation history
-├── hospitals/         # Hospital profiles and emergency blood request management
-├── notifications/     # Notification models, context processors, and alert views
-├── organizations/     # Camp coordination and awareness drive management
-├── rewards/           # Gamification points, badges, services, and leaderboards
-├── static/            # CSS stylesheets and interactive JavaScript
-└── templates/         # HTML5 templates with clean modular inheritance
-```
+**1. Admin approval for hospitals & organizations**
+New hospital/organization accounts start **Pending** and must be approved by an
+admin (Admin → Dashboard → **Approvals**) before they can operate. Donors
+self-register and get access immediately. Approval also sets the account's
+**Verified ✓** flag.
+
+**2. Login-required donor search (privacy)**
+"Find Donors" and donor contact pages now require login, so donor names and
+contact details are never public.
+
+**3. Donation certificate upload + approval (proof)**
+Donors upload a **photo/PDF certificate** (Donation History → *Upload
+Certificate*). It stays **Pending** until an admin or hospital approves it
+(Admin/Hospital → **Certificates**). Only **approved** certificates add a
+verified donation and award points/badges.
+
+**4. Email contact + email alerts**
+The donor page now has an **Email** button (replaces Call). When a hospital
+raises a request, matched donors also receive an **emergency email** in addition
+to the in-app alert. See *Email setup* below.
+
+**5. Two-way notification system**
+- Hospital gets a **"request sent to N donors"** confirmation.
+- Matched donors get the emergency alert and an **"I can donate / Can't right now"** button.
+- When a donor accepts, the **hospital is notified** (in-app + email) with the donor's contact.
+- The responding donor gets a **thank-you** notification.
+- The hospital's request page shows a **responders list** with contact details.
 
 ---
 
-## 🧪 Running Tests
-```bash
-python manage.py test
+## 📧 Email setup (Gmail SMTP)
+
+Emails work out of the box using the **console backend** (messages print to the
+terminal) — no setup needed for a demo.
+
+To send **real emails via Gmail**, add your credentials in `config/settings.py`
+(or as environment variables `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD`):
+
+```python
+EMAIL_HOST_USER = "yourname@gmail.com"
+EMAIL_HOST_PASSWORD = "abcd efgh ijkl mnop"   # 16-char Gmail App Password
 ```
+
+Get an App Password at **Google Account → Security → 2-Step Verification → App
+passwords**. With both values set, BloodLink switches to Gmail SMTP
+automatically; leave them blank to keep the console backend.
 
 ---
 
-## 📄 License
-This project is open-source and available under the MIT License.
+## 🗂️ Tech
+- Django 6.1 · SQLite (swap `DATABASES` in `config/settings.py` for Postgres/MySQL)
+- Custom role-based User model · media uploads for certificates
+- Vanilla animated CSS + Font Awesome (no build step)
+
+## ⚠️ Production notes
+- Set `DEBUG = False`, change `SECRET_KEY`, configure `ALLOWED_HOSTS`
+- Run `python manage.py collectstatic`
+- Serve `MEDIA_ROOT` (uploaded certificates) via your web server

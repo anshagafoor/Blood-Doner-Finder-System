@@ -32,3 +32,26 @@ def notify(recipient, title, message, notification_type=Notification.Type.SYSTEM
         recipient=recipient, title=title, message=message,
         notification_type=notification_type, link=link,
     )
+
+
+def send_email_safe(recipient, subject, message):
+    """Send an email to a user, ignoring any delivery errors.
+
+    Never raises — a mail failure must not break the request flow.
+    Returns True if the send was attempted without error, else False.
+    """
+    from django.conf import settings
+    from django.core.mail import send_mail
+
+    to_address = getattr(recipient, "email", "") or ""
+    if not to_address:
+        return False
+    try:
+        send_mail(
+            subject, message,
+            settings.DEFAULT_FROM_EMAIL, [to_address],
+            fail_silently=True,
+        )
+        return True
+    except Exception:
+        return False

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Certificate Review · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="dash-head reveal in">
+      <h1><i class="fa-solid fa-certificate" style="color:var(--red-600)"></i> Donation Certificates</h1>
+      <span class="pill {% if pending %}pill-amber{% else %}pill-green{% endif %}">{{ pending|length }} pending</span>
+    </div>
+
+    <h3 class="reveal in" style="margin:14px 0 12px">Pending review</h3>
+    <div class="table-card reveal in">
+      <table class="data">
+        <thead><tr><th>Donor</th><th>Date</th><th>Location</th><th>Units</th><th>File</th><th>Action</th></tr></thead>
+        <tbody>
+        {% for c in pending %}
+          <tr>
+            <td><strong>{{ c.donor.full_name }}</strong> <span class="pill pill-red" style="font-size:.68rem">{{ c.donor.blood_group }}</span></td>
+            <td>{{ c.donation_date }}</td>
+            <td>{{ c.location }}</td>
+            <td>{{ c.units }}</td>
+            <td><a href="{{ c.certificate_file.url }}" target="_blank" class="btn btn-ghost btn-sm"><i class="fa-solid fa-file-lines"></i> View</a></td>
+            <td>
+              <a href="{% url 'donors:cert_action' c.pk 'approve' %}" class="btn btn-green btn-sm"><i class="fa-solid fa-check"></i> Approve</a>
+              <a href="{% url 'donors:cert_action' c.pk 'reject' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-xmark"></i> Reject</a>
+            </td>
+          </tr>
+        {% empty %}<tr><td colspan="6"><div class="empty"><i class="fa-solid fa-inbox"></i>No certificates waiting for review.</div></td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if reviewed %}
+    <h3 class="reveal in" style="margin:28px 0 12px">Recently reviewed</h3>
+    <div class="table-card reveal in">
+      <table class="data">
+        <thead><tr><th>Donor</th><th>Date</th><th>Status</th><th>Reviewed by</th></tr></thead>
+        <tbody>
+        {% for c in reviewed %}
+          <tr>
+            <td>{{ c.donor.full_name }}</td>
+            <td>{{ c.donation_date }}</td>
+            <td><span class="pill {% if c.status == 'APPROVED' %}pill-green{% else %}pill-gray{% endif %}">{{ c.get_status_display }}</span></td>
+            <td>{{ c.reviewed_by.username|default:"—" }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

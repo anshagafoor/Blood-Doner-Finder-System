@@ -18,7 +18,13 @@ def register_choice(request):
 
 def _finish(request, user):
     login(request, user)
-    messages.success(request, f"Welcome, {user.username}! Your account is ready.")
+    if user.is_hospital or user.is_organization:
+        messages.info(
+            request,
+            "Account created! It is now pending admin approval. "
+            "You'll get full access once an administrator approves it.")
+    else:
+        messages.success(request, f"Welcome, {user.username}! Your account is ready.")
     return redirect("core:dashboard")
 
 

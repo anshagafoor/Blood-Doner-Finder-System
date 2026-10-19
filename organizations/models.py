@@ -4,6 +4,12 @@ from django.utils import timezone
 from accounts.constants import DISTRICTS
 
 
+class ApprovalStatus(models.TextChoices):
+    PENDING = "PENDING", "Pending"
+    APPROVED = "APPROVED", "Approved"
+    REJECTED = "REJECTED", "Rejected"
+
+
 class OrganizationProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                 related_name="org_profile")
@@ -12,10 +18,16 @@ class OrganizationProfile(models.Model):
     address = models.TextField(blank=True)
     website = models.URLField(blank=True)
     verified = models.BooleanField(default=False)
+    approval_status = models.CharField(max_length=10, choices=ApprovalStatus.choices,
+                                       default=ApprovalStatus.PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.org_name
+
+    @property
+    def is_approved(self):
+        return self.approval_status == ApprovalStatus.APPROVED
 
 
 class DonationCamp(models.Model):

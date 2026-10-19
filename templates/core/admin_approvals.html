@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Account Approvals · BloodLink{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="dash-head reveal in">
+      <h1><i class="fa-solid fa-user-check" style="color:var(--red-600)"></i> Account Approvals</h1>
+      <span class="pill {% if pending_count %}pill-amber{% else %}pill-green{% endif %}">{{ pending_count }} pending</span>
+    </div>
+
+    <h3 class="reveal in" style="margin:18px 0 12px"><i class="fa-solid fa-hospital" style="color:var(--red-600)"></i> Hospitals</h3>
+    <div class="table-card reveal in">
+      <table class="data">
+        <thead><tr><th>Hospital</th><th>District</th><th>Licence</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+        {% for h in hospitals %}
+          <tr>
+            <td><strong>{{ h.hospital_name }}</strong><br><small style="color:var(--muted)">{{ h.user.email }}</small></td>
+            <td>{{ h.district }}</td>
+            <td>{{ h.license_number }}</td>
+            <td><span class="pill {% if h.approval_status == 'APPROVED' %}pill-green{% elif h.approval_status == 'REJECTED' %}pill-gray{% else %}pill-amber{% endif %}">{{ h.get_approval_status_display }}</span></td>
+            <td>
+              {% if h.approval_status != 'APPROVED' %}
+                <a href="{% url 'core:admin_approve_action' 'hospital' h.pk 'approve' %}" class="btn btn-green btn-sm"><i class="fa-solid fa-check"></i> Approve</a>
+              {% endif %}
+              {% if h.approval_status != 'REJECTED' %}
+                <a href="{% url 'core:admin_approve_action' 'hospital' h.pk 'reject' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-xmark"></i> Reject</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}<tr><td colspan="5"><div class="empty"><i class="fa-solid fa-hospital"></i>No hospitals registered.</div></td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="reveal in" style="margin:28px 0 12px"><i class="fa-solid fa-building-ngo" style="color:var(--red-600)"></i> Organizations</h3>
+    <div class="table-card reveal in">
+      <table class="data">
+        <thead><tr><th>Organization</th><th>District</th><th>Website</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+        {% for o in orgs %}
+          <tr>
+            <td><strong>{{ o.org_name }}</strong><br><small style="color:var(--muted)">{{ o.user.email }}</small></td>
+            <td>{{ o.district }}</td>
+            <td>{{ o.website|default:"—" }}</td>
+            <td><span class="pill {% if o.approval_status == 'APPROVED' %}pill-green{% elif o.approval_status == 'REJECTED' %}pill-gray{% else %}pill-amber{% endif %}">{{ o.get_approval_status_display }}</span></td>
+            <td>
+              {% if o.approval_status != 'APPROVED' %}
+                <a href="{% url 'core:admin_approve_action' 'org' o.pk 'approve' %}" class="btn btn-green btn-sm"><i class="fa-solid fa-check"></i> Approve</a>
+              {% endif %}
+              {% if o.approval_status != 'REJECTED' %}
+                <a href="{% url 'core:admin_approve_action' 'org' o.pk 'reject' %}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-xmark"></i> Reject</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}<tr><td colspan="5"><div class="empty"><i class="fa-solid fa-building"></i>No organizations registered.</div></td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

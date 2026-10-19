@@ -14,7 +14,7 @@
         <div class="card" style="box-shadow:none"><small style="color:var(--muted)">Email</small><br><strong>{{ donor.user.email|default:"—" }}</strong></div>
         <div class="card" style="box-shadow:none"><small style="color:var(--muted)">Donations</small><br><strong>{{ donor.total_donations }}</strong></div>
       </div>
-      {% if donor.user.phone %}<a href="tel:{{ donor.user.phone }}" class="btn btn-primary btn-block" style="margin-top:18px"><i class="fa-solid fa-phone"></i> Call {{ donor.full_name }}</a>{% endif %}
+      {% if donor.user.email %}<a href="mailto:{{ donor.user.email }}?subject=BloodLink%20-%20Blood%20Donation%20Request&body=Hello%20{{ donor.full_name }}%2C%0A%0AWe%20may%20need%20your%20help%20with%20a%20blood%20donation." class="btn btn-primary btn-block" style="margin-top:18px;color:#fff"><i class="fa-solid fa-envelope"></i> Email {{ donor.full_name }}</a>{% endif %}
     </div>
   </div>
 </section>

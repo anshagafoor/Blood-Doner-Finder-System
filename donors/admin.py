@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DonorProfile, DonationHistory
+from .models import DonorProfile, DonationHistory, DonationCertificate
 
 @admin.register(DonorProfile)
 class DonorProfileAdmin(admin.ModelAdmin):
@@ -12,3 +12,9 @@ class DonorProfileAdmin(admin.ModelAdmin):
 class DonationHistoryAdmin(admin.ModelAdmin):
     list_display = ("donor", "date", "location", "units", "points_awarded")
     list_filter = ("date",)
+
+@admin.register(DonationCertificate)
+class DonationCertificateAdmin(admin.ModelAdmin):
+    list_display = ("donor", "donation_date", "location", "status", "reviewed_by", "created_at")
+    list_filter = ("status", "donation_date")
+    search_fields = ("donor__full_name",)

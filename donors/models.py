@@ -59,3 +59,33 @@ class DonationHistory(models.Model):
 
     def __str__(self):
         return f"{self.donor.full_name} donated on {self.date}"
+
+
+class DonationCertificate(models.Model):
+    """Donor-submitted proof of a donation; counts only after approval."""
+
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Pending review"
+        APPROVED = "APPROVED", "Approved"
+        REJECTED = "REJECTED", "Rejected"
+
+    donor = models.ForeignKey(DonorProfile, on_delete=models.CASCADE,
+                              related_name="certificates")
+    certificate_file = models.FileField(upload_to="certificates/")
+    donation_date = models.DateField(default=timezone.now)
+    location = models.CharField(max_length=150)
+    units = models.PositiveSmallIntegerField(default=1)
+    note = models.CharField(max_length=200, blank=True)
+    status = models.CharField(max_length=10, choices=Status.choices,
+                              default=Status.PENDING)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
+                                    on_delete=models.SET_NULL, related_name="reviewed_certificates")
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    review_note = models.CharField(max_length=200, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Certificate: {self.donor.full_name} ({self.get_status_display()})"

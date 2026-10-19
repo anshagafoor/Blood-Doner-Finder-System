@@ -1,6 +1,31 @@
 from django import forms
-from .models import DonorProfile
+from .models import DonorProfile, DonationCertificate
 from accounts.constants import BLOOD_GROUPS, DISTRICTS
+
+
+class DonationCertificateForm(forms.ModelForm):
+    class Meta:
+        model = DonationCertificate
+        fields = ["certificate_file", "donation_date", "location", "units", "note"]
+        widgets = {
+            "donation_date": forms.DateInput(attrs={"type": "date"}),
+            "note": forms.TextInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.widget.attrs["class"] = (field.widget.attrs.get("class", "") + " form-input").strip()
+
+    def clean_certificate_file(self):
+        f = self.cleaned_data.get("certificate_file")
+        if f:
+            allowed = (".pdf", ".png", ".jpg", ".jpeg", ".webp")
+            if not f.name.lower().endswith(allowed):
+                raise forms.ValidationError("Upload a PDF or an image (png, jpg, jpeg, webp).")
+            if f.size > 5 * 1024 * 1024:
+                raise forms.ValidationError("File too large (max 5 MB).")
+        return f
 
 
 class DonorProfileForm(forms.ModelForm):

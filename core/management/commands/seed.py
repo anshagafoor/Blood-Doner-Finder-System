@@ -72,7 +72,8 @@ class Command(BaseCommand):
                                           role=User.Role.HOSPITAL, phone="04842200000")
             hp = HospitalProfile.objects.create(
                 user=hu, hospital_name="City Care Hospital", district="Ernakulam",
-                license_number="KL-HOSP-2291", address="MG Road, Kochi", verified=True)
+                license_number="KL-HOSP-2291", address="MG Road, Kochi",
+                verified=True, approval_status="APPROVED")
             BloodRequest.objects.create(
                 hospital=hp, patient_name="Emergency Patient", blood_group="O+",
                 units_needed=2, district="Ernakulam", urgency=BloodRequest.Urgency.CRITICAL,
@@ -89,7 +90,7 @@ class Command(BaseCommand):
                                           role=User.Role.ORGANIZATION, phone="9846000000")
             op = OrganizationProfile.objects.create(
                 user=ou, org_name="LifeShare Foundation", district="Ernakulam",
-                address="Kaloor, Kochi", verified=True)
+                address="Kaloor, Kochi", verified=True, approval_status="APPROVED")
             DonationCamp.objects.create(
                 organization=op, title="Mega Blood Donation Camp",
                 description="A community-wide blood donation drive open to all eligible donors.",
@@ -105,5 +106,23 @@ class Command(BaseCommand):
                 description="An awareness session on blood compatibility and safe donation.",
                 date=timezone.now().date() + timedelta(days=5), location="Community Center, Kochi")
             self.stdout.write("Organization created -> org1 / org12345")
+
+        # A PENDING hospital + organization (to demo admin approval)
+        if not User.objects.filter(username="hospital2").exists():
+            hu2 = User.objects.create_user("hospital2", "hosp2@mail.com", "hospital12345",
+                                           role=User.Role.HOSPITAL, phone="04954400000")
+            HospitalProfile.objects.create(
+                user=hu2, hospital_name="Sunrise Medical Center", district="Kozhikode",
+                license_number="KL-HOSP-5533", address="Beach Road, Kozhikode",
+                verified=False, approval_status="PENDING")
+            self.stdout.write("Pending hospital created -> hospital2 / hospital12345")
+
+        if not User.objects.filter(username="org2").exists():
+            ou2 = User.objects.create_user("org2", "org2@mail.com", "org12345",
+                                           role=User.Role.ORGANIZATION, phone="9847700000")
+            OrganizationProfile.objects.create(
+                user=ou2, org_name="RedHope Volunteers", district="Thrissur",
+                address="Round South, Thrissur", verified=False, approval_status="PENDING")
+            self.stdout.write("Pending organization created -> org2 / org12345")
 
         self.stdout.write(self.style.SUCCESS("Seeding complete!"))

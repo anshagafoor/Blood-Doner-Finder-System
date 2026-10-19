@@ -1,12 +1,15 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 
 from accounts.models import User
-from accounts.permissions import role_required
+from accounts.permissions import role_required, account_approved
 from donors.models import DonorProfile, DonationHistory
 from hospitals.models import HospitalProfile, BloodRequest
 from organizations.models import OrganizationProfile, DonationCamp
+from notifications.models import notify, Notification
 from accounts.constants import BLOOD_GROUPS
 
 
@@ -27,6 +30,9 @@ def dashboard(request):
     user = request.user
     if user.is_admin_role:
         return redirect("core:admin_dashboard")
+    # Hospitals/organizations must be approved first
+    if (user.is_hospital or user.is_organization) and not account_approved(user):
+        return redirect("core:pending_approval")
     if user.is_donor:
         return _donor_dashboard(request)
     if user.is_hospital:
@@ -34,6 +40,59 @@ def dashboard(request):
     if user.is_organization:
         return _org_dashboard(request)
     return render(request, "core/dashboard.html", {})
+
+
+@login_required
+def pending_approval(request):
+    """Shown to hospital/organization users whose account is not yet approved."""
+    if account_approved(request.user):
+        return redirect("core:dashboard")
+    status = "PENDING"
+    prof = getattr(request.user, "hospital_profile", None) or getattr(request.user, "org_profile", None)
+    if prof:
+        status = prof.approval_status
+    return render(request, "core/pending_approval.html", {"status": status})
+
+
+@role_required(User.Role.ADMIN)
+def admin_approvals(request):
+    """Admin screen: approve or reject pending hospitals and organizations."""
+    from hospitals.models import ApprovalStatus as HAS
+    hospitals = HospitalProfile.objects.all().order_by("approval_status", "-created_at")
+    orgs = OrganizationProfile.objects.all().order_by("approval_status", "-created_at")
+    pending_count = (hospitals.filter(approval_status="PENDING").count() +
+                     orgs.filter(approval_status="PENDING").count())
+    return render(request, "core/admin_approvals.html",
+                  {"hospitals": hospitals, "orgs": orgs, "pending_count": pending_count})
+
+
+@role_required(User.Role.ADMIN)
+def admin_approve_action(request, kind, pk, action):
+    """Approve or reject a hospital/organization account."""
+    if kind == "hospital":
+        prof = get_object_or_404(HospitalProfile, pk=pk)
+        name = prof.hospital_name
+    else:
+        prof = get_object_or_404(OrganizationProfile, pk=pk)
+        name = prof.org_name
+
+    if action == "approve":
+        prof.approval_status = "APPROVED"
+        prof.verified = True
+        prof.save(update_fields=["approval_status", "verified"])
+        notify(prof.user, title="Account approved!",
+               message=f"Your account '{name}' has been approved by the admin. You now have full access.",
+               notification_type=Notification.Type.SYSTEM, link="/dashboard/")
+        messages.success(request, f"{name} approved.")
+    elif action == "reject":
+        prof.approval_status = "REJECTED"
+        prof.verified = False
+        prof.save(update_fields=["approval_status", "verified"])
+        notify(prof.user, title="Account not approved",
+               message=f"Your account '{name}' was not approved. Please contact the administrator.",
+               notification_type=Notification.Type.SYSTEM)
+        messages.info(request, f"{name} rejected.")
+    return redirect("core:admin_approvals")
 
 
 def _donor_dashboard(request):

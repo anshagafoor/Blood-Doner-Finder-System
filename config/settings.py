@@ -1,4 +1,5 @@
 """Django settings for the Blood Donor Finder System."""
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -89,4 +90,28 @@ LOGIN_REDIRECT_URL = "core:dashboard"
 LOGOUT_REDIRECT_URL = "core:home"
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
-# Production readiness check completed
+# ---------------------------------------------------------------------------
+# EMAIL (Gmail SMTP)
+# ---------------------------------------------------------------------------
+# To send real emails, set your Gmail address and a 16-character Gmail
+# "App Password" below (Google Account -> Security -> 2-Step Verification ->
+# App passwords). You can also set them as environment variables
+# EMAIL_HOST_USER and EMAIL_HOST_PASSWORD instead of editing this file.
+#
+# If these are left blank, the app automatically falls back to the console
+# backend (emails are printed to the terminal) so the project still runs
+# out of the box without any credentials.
+
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")          # e.g. "yourname@gmail.com"
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")  # e.g. "abcd efgh ijkl mnop"
+
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "smtp.gmail.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    DEFAULT_FROM_EMAIL = f"BloodLink <{EMAIL_HOST_USER}>"
+else:
+    # No credentials provided -> print emails to the console instead.
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = "BloodLink <no-reply@bloodlink.local>"
